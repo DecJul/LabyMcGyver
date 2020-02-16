@@ -1,0 +1,124 @@
+InitGame {
+    pour i de 0 à 14 faire
+	pour j de 0 à 14 faire
+	    Map(i, j)=Lire('map.txt') //à revoir................................................
+        fait
+    fait
+    XMcG, YMcG= 0,0
+    XObj, YObj = SearchFreeSpace ()
+    Map(XObj, YObj) = E //Ether
+    XObj, YObj = SearchFreeSpace ()
+    Map(XObj, YObj) = T //Tube
+    XObj, YObj = SearchFreeSpace ()
+    Map(XObj, YObj) = A //Aiguille
+}
+
+SearchFreeSpace (){
+    X, Y : entier
+    K = 'X'
+    Tant que K!='_' faire
+	X = random(0-14)
+	Y = random(0-14)
+        K = Map(X,Y)
+    Fait
+    return (X,Y)	
+}
+
+AfficherMap() {
+    Pour i de 0 à 14 faire
+	pour j de 0 à 14 faire
+            Ecrire(Map(i ,j))
+        Fait
+        EcrireLn(" ")
+    Fait
+    EcrireLn("Tube=("+PossedeTube+") Aiguille=("+PossedeAiguille+") Ether=("+PossedeEther+").")
+
+}
+
+Deplacement() {
+    Ecrire("Dans quel direction voulez vous allez?")
+    Direction = Lire()
+    Si Direction == 'z' Et YMcG != 0 Et Map(XMcG, YMcG+1) != X alors
+        Map(XMcG, YMcG)='_'
+        YMcG++
+        Objet()
+        Map(XMcG, YMcG)='M'
+    Sinon si Direction == 'q' Et XMcG != 14 Et Map(XMcG-1, YMcG) != X alors
+	Map(XMcG, YMcG)='_'
+        XMcG--
+        Objet()
+        Map(XMcG, YMcG)='M'
+    Sinon si Direction == 's' Et YMcG != 14 Et Map(XMcG, YMcG-1) != X alors
+        Map(XMcG, YMcG)='_'
+        YMcG--
+        Objet()
+        Map(XMcG, YMcG)='M'
+    Sinon si Direction == 'd' Et XMcG != 0 Et Map(XMcG+1, YMcG) != X alors
+        Map(XMcG, YMcG)='_'
+        XMcG++
+        Objet()
+        Map(XMcG, YMcG)='M'        
+    Sinon
+        EcrireLn("Commande non autorisée!")
+    Fin
+}
+
+Objet() {
+    Si Map(XMcG, YMcG) == 'E' alors
+	PossedeEther = 'X'
+    Sinon si Map(XMcG, YMcG) == 'A' alors
+	PossedeAiguille = 'X'
+    Sinon si Map(XMcG, YMcG) == 'T' alors
+	PossedeTube = 'X'
+    Sinon si XMcG == 14 Et YMcG == 14 alors
+	PartieEnCours = False
+	Si PossedeEther = 'X' et PossedeAiguille = 'X' et PossedeTube = 'X' alors
+	   Win = True
+	Fin
+    Fin
+}
+
+
+Programme Principal() {
+
+    Map : tableau de caractères de 2 dimension
+    XMcG, YMcG : entier //position joueur
+    XObj, YObj : entier //position objet
+    PossedeTube = '_' : caractère
+    PossedeAiguille = '_' : caractère
+    PossedeEther = '_' : caractère
+    PartieEnCours = true : booléen
+    Win = false : booléen
+    i, j : entier
+    K, Direction = caractère
+
+    InitGame()
+    EcrireLn("Bienvenue dans McGyver s'échape du labyrinthe infernal!")
+    EcrireLn(" ")
+    EcrireLn("Votre mission: sortir du labyrinthe après avoir neutralisé le garde")
+    EcrireLn("grace à une seringue fabriqué à partir d'un tube d'une aiguille et de l'Ether")
+    EcrireLn("que vous aurez précèdemment récupéré.")
+    EcrireLn("M=votre personnage G=Guardien E=Ether T=Tube A=Aiguille")
+    EcrireLn("Déplacement : z,q,s,d")
+    EcrireLn("Bonne chance!")
+    Lire()
+    AfficherMap()
+
+    Tant que GameOver faire{
+        Deplacement()
+	AfficherMap()
+    fait
+    AfficherMap()
+
+    EcrireLn("Game Over!")
+    EcrireLn(" ")
+    Si Win alors
+        Ecrire("Vous avez Gagnez!")
+    Sinon
+	Ecrire("Vous avez perdu!")
+    Fin
+    Lire()
+}
+
+    
+
