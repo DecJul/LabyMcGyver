@@ -1,9 +1,9 @@
-M________X_____
-_XXXXXXX_X_XXXX
+_________X_____
+_XXXXXXX_X_XXX_
 ____X___XXX__X_
 XXX_XX_XXX___X_
-__________XX___
-XXX_X___XX_XXXX
+_________X_X___
+XXX_X___XX_X_XX
 ____X_X__X_X___
 _XXXX_XX_X_XXXX
 ______X__X_____
@@ -12,4 +12,4 @@ __X___X________
 _XX_X_X_XX_XXX_
 ____X_X_X____X_
 _XXXXXX_XXXXXX_
-_____________XG
+_____________X_
