@@ -17,7 +17,7 @@ class Game:
         Laby.place_item("Tube")
         Laby.place_item("Ether")
         Graphic.item()
-        Graphic.show_case(Image.MCGYVER,McGyver.POS)
+        Graphic.show_case(Image.MCGYVER_DOWN,McGyver.POS)
         Graphic.show_case(Image.GARDIEN,Gardien.POS)
 
     def event():
@@ -27,27 +27,32 @@ class Game:
             if event.type == KEYDOWN:
                 if event.key == (K_DOWN or K_S):
                     newpos = Position(McGyver.POS.lat+1,McGyver.POS.lon)
+                    file = Image.MCGYVER_DOWN
                 elif event.key == (K_UP or K_Z):
                     newpos = Position(McGyver.POS.lat-1,McGyver.POS.lon)
+                    file = Image.MCGYVER_UP
                 elif event.key == (K_LEFT or K_Q):
                     newpos = Position(McGyver.POS.lat,McGyver.POS.lon-1)
+                    file = Image.MCGYVER_LEFT
                 elif event.key == (K_RIGHT or K_D):
                     newpos = Position(McGyver.POS.lat,McGyver.POS.lon+1)
+                    file = Image.MCGYVER_RIGHT
                 else:
-                    newpos = McGyver.POS
-                Game.new_case(newpos)
+                    break
+                Game.new_case(newpos,file)
       
-    def new_case(position):
+    def new_case(position,file):
         item = Item("new_case",position)
         if item in Laby.WALLS or position.lat not in range(15) or position.lon not in range(15):
-            pass
+            Graphic.show_case(Image.SOL,McGyver.POS)
+            Graphic.show_case(file,McGyver.POS)
         elif position == McGyver.POS:
             pass
         else:
             Graphic.show_case(Image.SOL,McGyver.POS)
             McGyver.POS = position
             Graphic.show_case(Image.SOL,McGyver.POS)
-            Graphic.show_case(Image.MCGYVER,McGyver.POS)
+            Graphic.show_case(file,McGyver.POS)
             if item in Laby.ITEMS:
                 Item.loot_item(position)
     
@@ -67,8 +72,8 @@ class Game:
         Game.ON = False
                                         
 class Graphic:
-    WIDTH_CASE = 30
-    HEIGTH_CASE = 30
+    WIDTH_CASE = 48
+    HEIGTH_CASE = 48
     
     @classmethod
     def open(cls):
@@ -143,13 +148,16 @@ class Image:
     
     @classmethod
     def load (cls):
-        cls.SOL = pygame.image.load("sol.jpg").convert()
-        cls.WALL = pygame.image.load("wall.jpg").convert()
-        cls.MCGYVER = pygame.image.load("McGyver.jpg").convert_alpha()
-        cls.GARDIEN = pygame.image.load("Gardien.jpg").convert_alpha()
-        cls.ETHER = pygame.image.load("ether.jpg").convert_alpha()
-        cls.AIGUILLE = pygame.image.load("aiguille.jpg").convert_alpha()
-        cls.TUBE = pygame.image.load("tube.jpg").convert_alpha()
+        cls.SOL = pygame.image.load("Ground.png").convert()
+        cls.WALL = pygame.image.load("Wall.png").convert()
+        cls.MCGYVER_UP = pygame.image.load("MacGyver_Up.png").convert_alpha()
+        cls.MCGYVER_DOWN = pygame.image.load("MacGyver_Down.png").convert_alpha()
+        cls.MCGYVER_LEFT = pygame.image.load("MacGyver_Left.png").convert_alpha()
+        cls.MCGYVER_RIGHT = pygame.image.load("MacGyver_Right.png").convert_alpha()
+        cls.GARDIEN = pygame.image.load("Gardien_Down.png").convert_alpha()
+        cls.ETHER = pygame.image.load("Ether.png").convert_alpha()
+        cls.AIGUILLE = pygame.image.load("Aiguille.png").convert_alpha()
+        cls.TUBE = pygame.image.load("Tube.png").convert_alpha()
         cls.WIN = pygame.image.load("win.jpg").convert_alpha()
         cls.LOOSE = pygame.image.load("loose.jpg").convert_alpha()
            
