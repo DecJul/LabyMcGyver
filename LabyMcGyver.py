@@ -7,40 +7,46 @@ pygame.init()
 
 class Game:
     ON = True
+    RULE = True
+    PLAY = False
+    END = False
     
     def init():
         Laby.place_wall()
-        Graphic.create_laby()
-        
+        Graphic.show_case(Image.RULE,Position(0,0))
+
+    def event():
+        for event in pygame.event.get():
+            if event.type == QUIT:
+                Game.off()
+            if Game.RULE:
+                Game.rule(event)
+            elif Game.PLAY:
+                McGyver.move(event)
+                if McGyver.POS == Gardien.POS:
+                    Game.end()
+            elif Game.END:
+                Game.replay(event)
+
+    def rule(event):
+        if event.type == KEYDOWN:
+            print("test")
+            Game.new_game()
+            Game.RULE = False
+          
     def new_game():
+        Game.PLAY = True
+        Game.END = False
+        Laby.ITEMS = []
+        McGyver.new_game()
+        Graphic.create_laby()
         Laby.place_item("Aiguille")
         Laby.place_item("Tube")
         Laby.place_item("Ether")
         Graphic.item()
         Graphic.show_case(Image.MCGYVER_DOWN,McGyver.POS)
         Graphic.show_case(Image.GARDIEN,Gardien.POS)
-
-    def event():
-        for event in pygame.event.get():
-            if event.type == QUIT:
-                Game.off()
-            if event.type == KEYDOWN:
-                if event.key == (K_DOWN or K_S):
-                    newpos = Position(McGyver.POS.lat+1,McGyver.POS.lon)
-                    file = Image.MCGYVER_DOWN
-                elif event.key == (K_UP or K_Z):
-                    newpos = Position(McGyver.POS.lat-1,McGyver.POS.lon)
-                    file = Image.MCGYVER_UP
-                elif event.key == (K_LEFT or K_Q):
-                    newpos = Position(McGyver.POS.lat,McGyver.POS.lon-1)
-                    file = Image.MCGYVER_LEFT
-                elif event.key == (K_RIGHT or K_D):
-                    newpos = Position(McGyver.POS.lat,McGyver.POS.lon+1)
-                    file = Image.MCGYVER_RIGHT
-                else:
-                    break
-                Game.new_case(newpos,file)
-      
+                
     def new_case(position,file):
         item = Item("new_case",position)
         if item in Laby.WALLS or position.lat not in range(15) or position.lon not in range(15):
@@ -57,17 +63,18 @@ class Game:
                 Item.loot_item(position)
     
     def end():
-        while Game.ON:
-            McGyver.craft_seringue()
-            if McGyver.SERINGUE == True:
-                Graphic.show_case(Image.WIN,Position(5,1))
-            else:
-                Graphic.show_case(Image.LOOSE,Position(5,1))
-            Graphic.refresh()
-            for event in pygame.event.get():
-                if event.type == QUIT:
-                    Game.off()
-                    
+        Game.END = True
+        Game.PLAY = False
+        McGyver.craft_seringue()
+        if McGyver.SERINGUE == True:
+            Graphic.show_case(Image.WIN,Position(5,1))
+        else:
+            Graphic.show_case(Image.LOOSE,Position(5,1))
+
+    def replay(event):
+        if event.type == KEYDOWN:
+            Game.new_game()
+                   
     def off():
         Game.ON = False
                                         
@@ -160,11 +167,15 @@ class Image:
         cls.TUBE = pygame.image.load("Tube.png").convert_alpha()
         cls.WIN = pygame.image.load("win.jpg").convert_alpha()
         cls.LOOSE = pygame.image.load("loose.jpg").convert_alpha()
+        cls.RULE = pygame.image.load("rule.jpg").convert_alpha()
            
 class McGyver:
-    POS = Position(0, 0)
-    SERINGUE = False
-        
+    
+    @classmethod
+    def new_game(cls):
+        cls.POS = Position(0, 0)
+        cls.SERINGUE = False
+    
     @classmethod
     def craft_seringue(cls):
         cls.SERINGUE = True
@@ -172,6 +183,25 @@ class McGyver:
             if not i.loot:
                 cls.SERINGUE = False
                 break
+
+    def move(event):
+        if event.type == KEYDOWN:
+            if event.key == K_DOWN or event.key == K_s:
+                newpos = Position(McGyver.POS.lat+1,McGyver.POS.lon)
+                file = Image.MCGYVER_DOWN
+                Game.new_case(newpos,file)
+            elif event.key == K_UP or event.key == K_w:
+                newpos = Position(McGyver.POS.lat-1,McGyver.POS.lon)
+                file = Image.MCGYVER_UP
+                Game.new_case(newpos,file)
+            elif event.key == K_LEFT or event.key == K_a:
+                newpos = Position(McGyver.POS.lat,McGyver.POS.lon-1)
+                file = Image.MCGYVER_LEFT
+                Game.new_case(newpos,file)
+            elif event.key == K_RIGHT or event.key == K_d:
+                newpos = Position(McGyver.POS.lat,McGyver.POS.lon+1)
+                file = Image.MCGYVER_RIGHT
+                Game.new_case(newpos,file)
 
 class Gardien:
     POS = Position(14,14)
@@ -200,13 +230,9 @@ class Wall:
 def main():
     Graphic.open()
     Image.load()
-    Game.init()    
-    Game.new_game()
+    Game.init()
     while Game.ON:
         Graphic.refresh()
         Game.event()
-        if McGyver.POS == Gardien.POS:
-            Game.end()
-
 
 main()
