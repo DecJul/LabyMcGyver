@@ -43,7 +43,7 @@ class Game:
         Laby.place_item("Aiguille")
         Laby.place_item("Tube")
         Laby.place_item("Ether")
-        Graphic.item()
+        Graphic.new_item()
         Graphic.show_case(Image.MCGYVER_DOWN,McGyver.POS)
         Graphic.show_case(Image.GARDIEN,Gardien.POS)
                 
@@ -65,7 +65,6 @@ class Game:
     def end():
         Game.END = True
         Game.PLAY = False
-        McGyver.craft_seringue()
         if McGyver.SERINGUE == True:
             Graphic.show_case(Image.WIN,Position(5,1))
         else:
@@ -84,7 +83,7 @@ class Graphic:
     
     @classmethod
     def open(cls):
-        cls.WINDOW = pygame.display.set_mode((Graphic.WIDTH_CASE*(Laby.LAT_MAX+1),Graphic.HEIGTH_CASE*(Laby.LON_MAX+1)))
+        cls.WINDOW = pygame.display.set_mode((Graphic.WIDTH_CASE*(Laby.LAT_MAX+1),Graphic.HEIGTH_CASE*(Laby.LON_MAX+2)))
     
     def create_laby():
         for i in range(Laby.LAT_MAX+1):
@@ -94,15 +93,19 @@ class Graphic:
                     Graphic.show_case(Image.WALL,wall.pos)
                 else:
                     Graphic.show_case(Image.SOL,wall.pos)
+        Graphic.show_case(Image.INTERFACE,Position(Laby.LON_MAX+1,0))
 
-    def item():
+    def new_item():
         for i in Laby.ITEMS:
-            if i.name == "Aiguille":
-                Graphic.show_case(Image.AIGUILLE,i.pos)
-            elif i.name == "Tube":
-                Graphic.show_case(Image.TUBE,i.pos)
-            elif i.name == "Ether":
-                Graphic.show_case(Image.ETHER,i.pos)
+            Graphic.item(i.name, i.pos)
+                
+    def item(name,pos):
+        if name == "Aiguille":
+            Graphic.show_case(Image.AIGUILLE,pos)
+        elif name == "Tube":
+            Graphic.show_case(Image.TUBE,pos)
+        elif name == "Ether":
+            Graphic.show_case(Image.ETHER,pos)
     
     def show_case(file,position):
         Graphic.WINDOW.blit(file, (position.lon*Graphic.WIDTH_CASE,position.lat*Graphic.HEIGTH_CASE))
@@ -168,22 +171,24 @@ class Image:
         cls.WIN = pygame.image.load("win.jpg").convert_alpha()
         cls.LOOSE = pygame.image.load("loose.jpg").convert_alpha()
         cls.RULE = pygame.image.load("rule.jpg").convert_alpha()
+        cls.INTERFACE = pygame.image.load("Interface.jpg").convert_alpha()
+        cls.SERINGUE = pygame.image.load("Seringue.jpg").convert_alpha()
            
 class McGyver:
+    
     
     @classmethod
     def new_game(cls):
         cls.POS = Position(0, 0)
         cls.SERINGUE = False
+        cls.LOOT = 0
     
     @classmethod
     def craft_seringue(cls):
         cls.SERINGUE = True
-        for i in Laby.ITEMS:
-            if not i.loot:
-                cls.SERINGUE = False
-                break
-
+        Graphic.show_case(Image.SERINGUE,Position(15,11))
+        
+        
     def move(event):
         if event.type == KEYDOWN:
             if event.key == K_DOWN or event.key == K_s:
@@ -219,6 +224,10 @@ class Item:
         for i in Laby.ITEMS:
             if i.pos == position and i.loot == False:
                 i.loot = True
+                Graphic.item(i.name,Position(15,1+(McGyver.LOOT*3)))
+                McGyver.LOOT += 1
+                if McGyver.LOOT == 3:
+                    McGyver.craft_seringue()
                 break
                         
 class Wall:
