@@ -1,11 +1,14 @@
 # -*- coding: utf8 -*-
-import random
 import pygame
 from pygame.locals import *
 
-pygame.init()
+import random
+
+"""Programme pour le Projet3 de la formation dev appli: Python"""
+
 
 class Game:
+    """Class qui gère les mécanisme du jeu"""
     ON = True
     RULE = True
     PLAY = False
@@ -76,8 +79,10 @@ class Game:
                    
     def off():
         Game.ON = False
-                                        
+
+
 class Graphic:
+    """Class qui s'occupe uniquement de la partie graphique du jeu"""
     WIDTH_CASE = 48
     HEIGTH_CASE = 48
     
@@ -113,16 +118,19 @@ class Graphic:
     def refresh():
         pygame.display.flip()
 
+
 class Position:
+    """Class qui gère les positions dans le labyrinthe de n'importe quel objet ou personnage"""
     def __init__(self, latitude, longitude):
         self.lat = latitude
         self.lon = longitude
         
     def __eq__(self, other):
         return (self.lat == other.lat) and (self.lon == other.lon)
-            
-class Laby:
 
+
+class Laby:
+    """Class qui stocke le placement des murs et des objet ainsi que les limites du labyrinthe"""
     LAT_MIN = 0
     LON_MIN = 0
     LAT_MAX = 14
@@ -154,8 +162,9 @@ class Laby:
         else:
             cls.place_item(name)
 
+
 class Image:
-    
+    """Class pour charger toutes les images utilisé dans le jeu"""
     @classmethod
     def load (cls):
         cls.SOL = pygame.image.load("Ground.png").convert()
@@ -173,10 +182,10 @@ class Image:
         cls.RULE = pygame.image.load("rule.jpg").convert_alpha()
         cls.INTERFACE = pygame.image.load("Interface.jpg").convert_alpha()
         cls.SERINGUE = pygame.image.load("Seringue.jpg").convert_alpha()
-           
+
+
 class McGyver:
-    
-    
+    """Class du personnage dirigé par le joueur"""
     @classmethod
     def new_game(cls):
         cls.POS = Position(0, 0)
@@ -187,8 +196,7 @@ class McGyver:
     def craft_seringue(cls):
         cls.SERINGUE = True
         Graphic.show_case(Image.SERINGUE,Position(15,11))
-        
-        
+            
     def move(event):
         if event.type == KEYDOWN:
             if event.key == K_DOWN or event.key == K_s:
@@ -208,19 +216,25 @@ class McGyver:
                 file = Image.MCGYVER_RIGHT
                 Game.new_case(newpos,file)
 
+
 class Gardien:
+    """Class pour géré le gardien"""
     POS = Position(14,14)
-        
+
+
 class Item:
+    """Class pour géré les objets qui peuvent être ramassé par le joueur"""
     def __init__(self, name, position):
         self.pos = position
         self.name = name
         self.loot = False
         
     def __eq__(self, other):
+        """Permet de comparer la position d'un objet à la position d'un autre objet ou d'un mur"""
         return (self.pos == other.pos)
                 
     def loot_item(position):
+        """Permet d'indiquer si un objet est récupéré et permet aussi de vérifier si tous les objets ont été récupéré"""
         for i in Laby.ITEMS:
             if i.pos == position and i.loot == False:
                 i.loot = True
@@ -229,19 +243,30 @@ class Item:
                 if McGyver.LOOT == 3:
                     McGyver.craft_seringue()
                 break
-                        
+
+
 class Wall:
+    """Class pour les murs"""
     def __init__(self, position):
         self.pos = position
+        
     def __eq__(self, other):
+        """Permet de comparer la position d'un mur à la position d'un autre mur ou d'un objet"""
         return (self.pos == other.pos)
 
+
 def main():
+    """Fonction principale en 2 temps:
+    -on initialise toutes les données du jeu
+    -puis on est dans une boucle qui continue tant que l'utilisateur ne quitte pas le jeu
+    """
+    pygame.init()
     Graphic.open()
     Image.load()
     Game.init()
     while Game.ON:
         Graphic.refresh()
         Game.event()
+
 
 main()
